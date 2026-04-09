@@ -90,6 +90,17 @@ export default function Navbar() {
                   {l.label}
                 </Link>
               ))}
+              {isAuthenticated ? (
+                <button onClick={() => { logout(); setMobileOpen(false); }}
+                  className="rounded-lg px-4 py-2 text-left text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground">
+                  Logout ({user?.name})
+                </button>
+              ) : (
+                <Link to="/auth" onClick={() => setMobileOpen(false)}
+                  className="rounded-lg px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground">
+                  Login / Sign Up
+                </Link>
+              )}
             </div>
           </motion.div>
         )}
