@@ -12,7 +12,7 @@ export default function Checkout() {
   const navigate = useNavigate();
 
   const [form, setForm] = useState<CustomerInfo>({
-    name: '', email: '', phone: '', address: '', city: '', state: '', pincode: ''
+    name: user?.name || '', email: user?.email || '', phone: '', address: '', city: '', state: '', pincode: ''
   });
 
   const handleChange = (field: keyof CustomerInfo, value: string) => {
