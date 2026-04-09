@@ -15,6 +15,7 @@ import Orders from "@/pages/Orders";
 import Wishlist from "@/pages/Wishlist";
 import UploadDesign from "@/pages/UploadDesign";
 import Auth from "@/pages/Auth";
+import Account from "@/pages/Account";
 import Contact from "@/pages/Contact";
 import NotFound from "@/pages/NotFound";
 
@@ -39,6 +40,7 @@ const App = () => (
                   <Route path="/orders" element={<Orders />} />
                   <Route path="/wishlist" element={<Wishlist />} />
                   <Route path="/upload-design" element={<UploadDesign />} />
+                  <Route path="/account" element={<Account />} />
                   <Route path="/auth" element={<Auth />} />
                   <Route path="/contact" element={<Contact />} />
                   <Route path="*" element={<NotFound />} />
