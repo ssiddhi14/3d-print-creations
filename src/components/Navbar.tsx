@@ -1,10 +1,9 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { ShoppingCart, Heart, Sun, Moon, Menu, X, Printer, User, LogOut, Mail } from 'lucide-react';
+import { ShoppingCart, Heart, Sun, Moon, Menu, X, Printer, User, LogOut, Package, MapPin, Shield, Phone, ChevronDown } from 'lucide-react';
 import { useStore } from '@/context/StoreContext';
 import { useAuth } from '@/context/AuthContext';
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 
 export default function Navbar() {
   const { cart, wishlist, darkMode, toggleDarkMode } = useStore();
@@ -15,7 +14,6 @@ export default function Navbar() {
   const profileRef = useRef<HTMLDivElement>(null);
   const cartCount = cart.reduce((s, i) => s + i.quantity, 0);
 
-  // Close profile dropdown on outside click
   useEffect(() => {
     const handler = (e: MouseEvent) => {
       if (profileRef.current && !profileRef.current.contains(e.target as Node)) {
@@ -33,15 +31,24 @@ export default function Navbar() {
     navigate('/');
   };
 
-  const getInitials = (name: string) =>
-    name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+  const closeAll = () => {
+    setProfileOpen(false);
+    setMobileOpen(false);
+  };
 
   const links = [
     { to: '/', label: 'Home' },
     { to: '/products', label: 'Shop' },
     { to: '/upload-design', label: 'Custom Print' },
-    { to: '/orders', label: 'Orders' },
     { to: '/contact', label: 'Contact' },
+  ];
+
+  const dropdownItems = [
+    { icon: Package, label: 'My Orders', to: '/orders' },
+    { icon: Heart, label: 'Wishlist', to: '/wishlist' },
+    { icon: MapPin, label: 'Your Addresses', to: '/account' },
+    { icon: Shield, label: 'Account Settings', to: '/account' },
+    { icon: Phone, label: 'Contact Support', to: '/contact' },
   ];
 
   return (
@@ -87,43 +94,51 @@ export default function Navbar() {
             <div className="relative hidden md:block" ref={profileRef}>
               <button
                 onClick={() => setProfileOpen(!profileOpen)}
-                className="flex items-center gap-2 rounded-lg px-2 py-1.5 transition-colors hover:bg-secondary"
+                className="flex items-center gap-1.5 rounded-lg border border-transparent px-3 py-1.5 transition-all hover:border-border hover:bg-secondary"
               >
-                <Avatar className="h-8 w-8">
-                  <AvatarFallback className="bg-primary text-xs font-bold text-primary-foreground">
-                    {getInitials(user?.name || 'U')}
-                  </AvatarFallback>
-                </Avatar>
-                <span className="text-sm font-medium">{user?.name?.split(' ')[0]}</span>
+                <User className="h-4 w-4 text-muted-foreground" />
+                <div className="text-left">
+                  <p className="text-xs leading-tight text-muted-foreground">Hello, {user?.name?.split(' ')[0]}</p>
+                  <p className="text-sm font-semibold leading-tight">Account & Lists</p>
+                </div>
+                <ChevronDown className={`h-3.5 w-3.5 text-muted-foreground transition-transform ${profileOpen ? 'rotate-180' : ''}`} />
               </button>
 
               <AnimatePresence>
                 {profileOpen && (
                   <motion.div
-                    initial={{ opacity: 0, y: 8, scale: 0.95 }}
+                    initial={{ opacity: 0, y: 8, scale: 0.96 }}
                     animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: 8, scale: 0.95 }}
+                    exit={{ opacity: 0, y: 8, scale: 0.96 }}
                     transition={{ duration: 0.15 }}
-                    className="absolute right-0 top-full mt-2 w-64 rounded-xl border border-border bg-card p-4 shadow-xl"
+                    className="absolute right-0 top-full mt-2 w-72 rounded-xl border border-border bg-card shadow-xl"
                   >
-                    <div className="flex items-center gap-3">
-                      <Avatar className="h-10 w-10">
-                        <AvatarFallback className="bg-primary font-bold text-primary-foreground">
-                          {getInitials(user?.name || 'U')}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div className="min-w-0 flex-1">
-                        <p className="truncate text-sm font-semibold">{user?.name}</p>
-                        <p className="flex items-center gap-1 truncate text-xs text-muted-foreground">
-                          <Mail className="h-3 w-3 shrink-0" />
-                          {user?.email}
-                        </p>
-                      </div>
+                    {/* User info header */}
+                    <div className="border-b border-border px-4 py-3">
+                      <p className="text-sm font-semibold">{user?.name}</p>
+                      <p className="text-xs text-muted-foreground">{user?.email}</p>
                     </div>
-                    <div className="mt-3 border-t border-border pt-3">
+
+                    {/* Menu items */}
+                    <div className="p-2">
+                      {dropdownItems.map(item => (
+                        <Link
+                          key={item.label}
+                          to={item.to}
+                          onClick={closeAll}
+                          className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+                        >
+                          <item.icon className="h-4 w-4" />
+                          {item.label}
+                        </Link>
+                      ))}
+                    </div>
+
+                    {/* Logout */}
+                    <div className="border-t border-border p-2">
                       <button
                         onClick={handleLogout}
-                        className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+                        className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-destructive transition-colors hover:bg-destructive/10"
                       >
                         <LogOut className="h-4 w-4" />
                         Logout
@@ -134,8 +149,9 @@ export default function Navbar() {
               </AnimatePresence>
             </div>
           ) : (
-            <Link to="/auth" className="hidden rounded-lg p-2 text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground md:block">
-              <User className="h-5 w-5" />
+            <Link to="/auth" className="hidden items-center gap-1.5 rounded-lg border border-transparent px-3 py-1.5 text-sm font-medium text-muted-foreground transition-all hover:border-border hover:bg-secondary hover:text-foreground md:flex">
+              <User className="h-4 w-4" />
+              Login / Sign Up
             </Link>
           )}
           <button onClick={() => setMobileOpen(!mobileOpen)} className="rounded-lg p-2 text-muted-foreground md:hidden">
@@ -154,32 +170,35 @@ export default function Navbar() {
           >
             <div className="flex flex-col gap-1 p-4">
               {links.map(l => (
-                <Link key={l.to} to={l.to} onClick={() => setMobileOpen(false)}
+                <Link key={l.to} to={l.to} onClick={closeAll}
                   className="rounded-lg px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground">
                   {l.label}
                 </Link>
               ))}
               {isAuthenticated ? (
                 <>
-                  <div className="mt-2 flex items-center gap-3 rounded-lg bg-secondary/50 px-4 py-3">
-                    <Avatar className="h-8 w-8">
-                      <AvatarFallback className="bg-primary text-xs font-bold text-primary-foreground">
-                        {getInitials(user?.name || 'U')}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="min-w-0">
-                      <p className="truncate text-sm font-semibold">{user?.name}</p>
-                      <p className="truncate text-xs text-muted-foreground">{user?.email}</p>
-                    </div>
+                  <div className="mt-2 rounded-lg bg-secondary/50 px-4 py-3">
+                    <p className="text-xs text-muted-foreground">Hello, {user?.name?.split(' ')[0]}</p>
+                    <p className="text-sm font-semibold">{user?.name}</p>
+                    <p className="text-xs text-muted-foreground">{user?.email}</p>
+                  </div>
+                  <div className="mt-1 space-y-0.5">
+                    {dropdownItems.map(item => (
+                      <Link key={item.label} to={item.to} onClick={closeAll}
+                        className="flex items-center gap-3 rounded-lg px-4 py-2 text-sm text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground">
+                        <item.icon className="h-4 w-4" />
+                        {item.label}
+                      </Link>
+                    ))}
                   </div>
                   <button onClick={handleLogout}
-                    className="mt-1 flex items-center gap-2 rounded-lg px-4 py-2 text-left text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground">
+                    className="mt-1 flex items-center gap-3 rounded-lg px-4 py-2 text-left text-sm font-medium text-destructive transition-colors hover:bg-destructive/10">
                     <LogOut className="h-4 w-4" />
                     Logout
                   </button>
                 </>
               ) : (
-                <Link to="/auth" onClick={() => setMobileOpen(false)}
+                <Link to="/auth" onClick={closeAll}
                   className="rounded-lg px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground">
                   Login / Sign Up
                 </Link>
