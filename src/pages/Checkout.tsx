@@ -1,11 +1,14 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useStore } from '@/context/StoreContext';
+import { useAuth } from '@/context/AuthContext';
 import { CustomerInfo, Order } from '@/lib/types';
 import { toast } from 'sonner';
+import { LogIn } from 'lucide-react';
 
 export default function Checkout() {
   const { cart, getCartSubtotal, getCartDiscount, getCartGST, getCartTotal, couponApplied, placeOrder, clearCart } = useStore();
+  const { isAuthenticated, user } = useAuth();
   const navigate = useNavigate();
 
   const [form, setForm] = useState<CustomerInfo>({
