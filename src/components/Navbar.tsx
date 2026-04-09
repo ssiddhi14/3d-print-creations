@@ -57,6 +57,18 @@ export default function Navbar() {
               </span>
             )}
           </Link>
+          {isAuthenticated ? (
+            <div className="hidden items-center gap-2 md:flex">
+              <span className="text-sm text-muted-foreground">{user?.name}</span>
+              <button onClick={logout} className="rounded-lg p-2 text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground">
+                <LogOut className="h-5 w-5" />
+              </button>
+            </div>
+          ) : (
+            <Link to="/auth" className="hidden rounded-lg p-2 text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground md:block">
+              <User className="h-5 w-5" />
+            </Link>
+          )}
           <button onClick={() => setMobileOpen(!mobileOpen)} className="rounded-lg p-2 text-muted-foreground md:hidden">
             {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
