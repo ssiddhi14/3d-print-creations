@@ -50,6 +50,20 @@ export default function Checkout() {
     return null;
   }
 
+  if (!isAuthenticated) {
+    return (
+      <div className="container mx-auto flex min-h-[50vh] flex-col items-center justify-center px-4 py-16 text-center">
+        <LogIn className="mb-4 h-12 w-12 text-muted-foreground" />
+        <h2 className="font-display text-2xl font-bold">Please login to place your order</h2>
+        <p className="mt-2 text-muted-foreground">You need to be signed in to proceed with checkout.</p>
+        <Link to="/auth" state={{ from: '/checkout' }}
+          className="mt-6 inline-flex items-center gap-2 rounded-xl bg-primary px-6 py-3 font-display font-semibold text-primary-foreground transition-all hover:opacity-90 active:scale-95">
+          Sign In / Sign Up
+        </Link>
+      </div>
+    );
+  }
+
   const fields: { key: keyof CustomerInfo; label: string; type?: string; placeholder: string }[] = [
     { key: 'name', label: 'Full Name', placeholder: 'John Doe' },
     { key: 'email', label: 'Email', type: 'email', placeholder: 'john@example.com' },
