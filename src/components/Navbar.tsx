@@ -7,6 +7,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 export default function Navbar() {
   const { cart, wishlist, darkMode, toggleDarkMode } = useStore();
+  const { isAuthenticated, user, logout } = useAuth();
+  const navigate = useNavigate();
   const [mobileOpen, setMobileOpen] = useState(false);
   const cartCount = cart.reduce((s, i) => s + i.quantity, 0);
 
@@ -15,7 +17,7 @@ export default function Navbar() {
     { to: '/products', label: 'Shop' },
     { to: '/upload-design', label: 'Custom Print' },
     { to: '/orders', label: 'Orders' },
-    { to: '/admin', label: 'Admin' },
+    { to: '/contact', label: 'Contact' },
   ];
 
   return (
