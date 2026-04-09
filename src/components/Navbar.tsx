@@ -1,11 +1,14 @@
-import { Link } from 'react-router-dom';
-import { ShoppingCart, Heart, Sun, Moon, Menu, X, Printer } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { ShoppingCart, Heart, Sun, Moon, Menu, X, Printer, User, LogOut } from 'lucide-react';
 import { useStore } from '@/context/StoreContext';
+import { useAuth } from '@/context/AuthContext';
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function Navbar() {
   const { cart, wishlist, darkMode, toggleDarkMode } = useStore();
+  const { isAuthenticated, user, logout } = useAuth();
+  const navigate = useNavigate();
   const [mobileOpen, setMobileOpen] = useState(false);
   const cartCount = cart.reduce((s, i) => s + i.quantity, 0);
 
@@ -14,7 +17,7 @@ export default function Navbar() {
     { to: '/products', label: 'Shop' },
     { to: '/upload-design', label: 'Custom Print' },
     { to: '/orders', label: 'Orders' },
-    { to: '/admin', label: 'Admin' },
+    { to: '/contact', label: 'Contact' },
   ];
 
   return (
@@ -54,6 +57,18 @@ export default function Navbar() {
               </span>
             )}
           </Link>
+          {isAuthenticated ? (
+            <div className="hidden items-center gap-2 md:flex">
+              <span className="text-sm text-muted-foreground">{user?.name}</span>
+              <button onClick={logout} className="rounded-lg p-2 text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground">
+                <LogOut className="h-5 w-5" />
+              </button>
+            </div>
+          ) : (
+            <Link to="/auth" className="hidden rounded-lg p-2 text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground md:block">
+              <User className="h-5 w-5" />
+            </Link>
+          )}
           <button onClick={() => setMobileOpen(!mobileOpen)} className="rounded-lg p-2 text-muted-foreground md:hidden">
             {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
@@ -75,6 +90,17 @@ export default function Navbar() {
                   {l.label}
                 </Link>
               ))}
+              {isAuthenticated ? (
+                <button onClick={() => { logout(); setMobileOpen(false); }}
+                  className="rounded-lg px-4 py-2 text-left text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground">
+                  Logout ({user?.name})
+                </button>
+              ) : (
+                <Link to="/auth" onClick={() => setMobileOpen(false)}
+                  className="rounded-lg px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground">
+                  Login / Sign Up
+                </Link>
+              )}
             </div>
           </motion.div>
         )}

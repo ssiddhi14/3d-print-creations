@@ -1,15 +1,18 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useStore } from '@/context/StoreContext';
+import { useAuth } from '@/context/AuthContext';
 import { CustomerInfo, Order } from '@/lib/types';
 import { toast } from 'sonner';
+import { LogIn } from 'lucide-react';
 
 export default function Checkout() {
   const { cart, getCartSubtotal, getCartDiscount, getCartGST, getCartTotal, couponApplied, placeOrder, clearCart } = useStore();
+  const { isAuthenticated, user } = useAuth();
   const navigate = useNavigate();
 
   const [form, setForm] = useState<CustomerInfo>({
-    name: '', email: '', phone: '', address: '', city: '', state: '', pincode: ''
+    name: user?.name || '', email: user?.email || '', phone: '', address: '', city: '', state: '', pincode: ''
   });
 
   const handleChange = (field: keyof CustomerInfo, value: string) => {
@@ -45,6 +48,20 @@ export default function Checkout() {
   if (cart.length === 0) {
     navigate('/cart');
     return null;
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <div className="container mx-auto flex min-h-[50vh] flex-col items-center justify-center px-4 py-16 text-center">
+        <LogIn className="mb-4 h-12 w-12 text-muted-foreground" />
+        <h2 className="font-display text-2xl font-bold">Please login to place your order</h2>
+        <p className="mt-2 text-muted-foreground">You need to be signed in to proceed with checkout.</p>
+        <Link to="/auth" state={{ from: '/checkout' }}
+          className="mt-6 inline-flex items-center gap-2 rounded-xl bg-primary px-6 py-3 font-display font-semibold text-primary-foreground transition-all hover:opacity-90 active:scale-95">
+          Sign In / Sign Up
+        </Link>
+      </div>
+    );
   }
 
   const fields: { key: keyof CustomerInfo; label: string; type?: string; placeholder: string }[] = [
